@@ -80,7 +80,7 @@ class Tankshell(pygame.sprite.Sprite):
 pygame.init()
 screen = pygame.display.set_mode((1000, 600))
 
-tankbody = Tankbody()
+#tankbody = Tankbody()
 
 background = pygame.Surface(screen.get_size())
 background.fill((0, 0, 20))
