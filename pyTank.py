@@ -8,7 +8,7 @@ class Tankbody(pygame.sprite.Sprite):
         self.image = pygame.Surface((26, 38))
         self.image.fill((100, 100, 100))
         self.image.set_colorkey((0, 0, 0))
-        pygame.draw.polygon(self.image, pygame.Color('dodgerblue'), ((0, 8), (26, 8), (13, 0)))
+        pygame.draw.polygon(self.image, pygame.Color('dodgerblue'), ((0, 8), (26, 8), (13, 38)))
         #pygame.draw.rect(self.image, (0,255,0), (60,10,50,50))
 
         self.org_image = self.image.copy()
@@ -19,33 +19,40 @@ class Tankbody(pygame.sprite.Sprite):
         self.pos = pygame.Vector2(self.rect.center)
         self.timeRunX = 1
         self.timeRunY = 1
-        self.tankMouseAgle = 0
+
 
     def update(self, events):
+        #这是坦克和鼠标的极坐标差
+        tankMousediff = pygame.mouse.get_pos() - pygame.Vector2(self.rect.center)
+
         for e in events:
             if e.type == pygame.KEYDOWN:
                 if e.key == pygame.K_SPACE:
                     print("111")#这里打算发射子弹
             if e.type ==  pygame.MOUSEBUTTONDOWN:
-                print("mouse")
+                print("tankMousediff："+str(tankMousediff[0]))
+                print("tankbodyAngle:"+str(self.angle))
+
 
         pressed = pygame.key.get_pressed()
         if pressed[pygame.K_a]:
             self.angle += 3
+            print("tankMousediff："+str(tankMousediff[0]))
+            print("tankbodyAngle:"+str(self.angle))
         if pressed[pygame.K_d]:
             self.angle -= 3
+            print("tankMousediff："+str(tankMousediff[0]))
+            print("tankbodyAngle:"+str(self.angle))
 
-        tankMousediff = pygame.mouse.get_pos() - pygame.Vector2(self.rect.center)
-        #print(tankMousediff[1])
+        if tankMousediff[0]>self.angle:
+            self.angle += 1
+        elif tankMousediff[0]<self.angle:
+            self.angle -= 1
 
+        self.image = pygame.transform.rotate(self.org_image, self.angle)
         self.direction = pygame.Vector2(1, 0).rotate(-self.angle)
-        #self.image = pygame.transform.rotate(self.org_image, -tankMousediff[1])
         self.rect = self.image.get_rect(center=self.rect.center)
 
-        #坦克和鼠标的角度
-        tankMousediff = pygame.mouse.get_pos() - pygame.Vector2(self.rect.center)
-
-        #print(tankMousediff[1])
 
         if self.rect.left < 0:
             self.rect.left = 0
