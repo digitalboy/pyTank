@@ -14,11 +14,9 @@ class Tankbody(pygame.sprite.Sprite):
         self.org_image = self.image.copy()
         self.angle = 0
         self.direction = pygame.Vector2(1, 0)
-        self.rect = self.image.get_rect(center=(200, 200))
-        #self.rect = self.image.get_rect()
+        self.rect = self.image.get_rect(center=(500, 300))
         self.pos = pygame.Vector2(self.rect.center)
-        self.timeRunX = 1
-        self.timeRunY = 1
+
 
 
     def update(self, events, dt):
@@ -31,7 +29,9 @@ class Tankbody(pygame.sprite.Sprite):
                 if e.key == pygame.K_SPACE:
                     print("111")#这里打算发射子弹
             if e.type ==  pygame.MOUSEBUTTONDOWN:
-                self.groups()[0].add(Projectile(self.rect.center, self.direction.normalize()))
+                for oneSprite in self.groups():
+                    print(oneSprite)
+                self.groups()[0].add(Tankshell(self.rect.center, self.direction.normalize()))
 
         self.image = pygame.transform.rotate(self.org_image, -tmTangle + 90)
         self.direction = pygame.Vector2(1, 0).rotate(-self.angle)
@@ -55,11 +55,11 @@ class Tankbody(pygame.sprite.Sprite):
 
         self.rect.move_ip(xDistance,yDistance)
 
-        self.rect.move_ip(0,0)
+        #self.rect.move_ip(0,0)
 
 
 
-class Projectile(pygame.sprite.Sprite):
+class Tankshell(pygame.sprite.Sprite):
     def __init__(self, pos, direction):
         super().__init__()
         self.image = pygame.Surface((8, 8))
@@ -85,8 +85,10 @@ tankbody = Tankbody()
 background = pygame.Surface(screen.get_size())
 background.fill((0, 0, 20))
 
-all_sprites = pygame.sprite.Group()
-all_sprites.add(tankbody)
+# all_sprites = pygame.sprite.Group()
+# all_sprites.add(tankbody)
+
+sprites = pygame.sprite.Group(Tankbody())
 
 clock = pygame.time.Clock()
 dt = 0
@@ -104,10 +106,14 @@ while running:
 
     dt = clock.tick(60)
     screen.blit(background, (0, 0))
-    tankbody.update(events, dt)
+    #tankbody.update(events, dt)
+    sprites.update(events, dt)
+
+    sprites.draw(screen)
+
+    #screen.blit(tankbody.image,tankbody.rect)
 
     pygame.display.update()
 
-    screen.blit(tankbody.image,tankbody.rect)
 
     pygame.display.flip()
