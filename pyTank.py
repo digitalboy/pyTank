@@ -31,10 +31,11 @@ class Tankbody(pygame.sprite.Sprite):
             if e.type ==  pygame.MOUSEBUTTONDOWN:
                 for oneSprite in self.groups():
                     print(oneSprite)
+                    print(self.groups())
                 self.groups()[0].add(Tankshell(self.rect.center, self.direction.normalize()))
 
         self.image = pygame.transform.rotate(self.org_image, -tmTangle + 90)
-        self.direction = pygame.Vector2(1, 0).rotate(-self.angle)
+        self.direction = pygame.Vector2(1, 0).rotate(tmTangle)
         self.rect = self.image.get_rect(center=self.rect.center)
 
 
@@ -106,14 +107,13 @@ while running:
 
     dt = clock.tick(60)
     screen.blit(background, (0, 0))
-    #tankbody.update(events, dt)
+
     sprites.update(events, dt)
 
     sprites.draw(screen)
 
     #screen.blit(tankbody.image,tankbody.rect)
 
-    pygame.display.update()
-
+    #pygame.display.update()
 
     pygame.display.flip()
