@@ -29,10 +29,8 @@ class Tankbody(pygame.sprite.Sprite):
                 if e.key == pygame.K_SPACE:
                     print("111")#这里打算发射子弹
             if e.type ==  pygame.MOUSEBUTTONDOWN:
-                for oneSprite in self.groups():
-                    print(oneSprite)
-                    print(self.groups())
                 self.groups()[0].add(Tankshell(self.rect.center, self.direction.normalize()))
+                print(self.direction.normalize())
 
         self.image = pygame.transform.rotate(self.org_image, -tmTangle + 90)
         self.direction = pygame.Vector2(1, 0).rotate(tmTangle)
@@ -53,11 +51,9 @@ class Tankbody(pygame.sprite.Sprite):
         yDistance = (pygame.mouse.get_pos()[1] - self.rect.y)/10
 
         pygame.time.delay(50)
-
-        self.rect.move_ip(xDistance,yDistance)
-
-        #self.rect.move_ip(0,0)
-
+        print(tmDistance)
+        if tmDistance > 20:
+            self.rect.move_ip(xDistance,yDistance)
 
 
 class Tankshell(pygame.sprite.Sprite):
@@ -86,9 +82,6 @@ screen = pygame.display.set_mode((1000, 600))
 background = pygame.Surface(screen.get_size())
 background.fill((0, 0, 20))
 
-# all_sprites = pygame.sprite.Group()
-# all_sprites.add(tankbody)
-
 sprites = pygame.sprite.Group(Tankbody())
 
 clock = pygame.time.Clock()
@@ -105,7 +98,7 @@ while running:
         elif event.type == QUIT:
             running = False
 
-    dt = clock.tick(60)
+    dt = clock.tick(120)
     screen.blit(background, (0, 0))
 
     sprites.update(events, dt)
