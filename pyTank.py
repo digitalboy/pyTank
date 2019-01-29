@@ -22,11 +22,13 @@ class Tankbody(pygame.sprite.Sprite):
         self.tankMouseAgle = 0
 
     def update(self, events):
-
         for e in events:
             if e.type == pygame.KEYDOWN:
                 if e.key == pygame.K_SPACE:
-                    print("111")
+                    print("111")#这里打算发射子弹
+            if e.type ==  pygame.MOUSEBUTTONDOWN:
+                print("mouse")
+
         pressed = pygame.key.get_pressed()
         if pressed[pygame.K_a]:
             self.angle += 3
@@ -132,16 +134,14 @@ running = True
 
 while running:
     events = pygame.event.get()
-    for event in pygame.event.get():
+    for event in events:
         if event.type == KEYDOWN:
             if event.key == K_ESCAPE:
                 running = False
-
         elif event.type == QUIT:
             running = False
 
     screen.blit(background, (0, 0))
-    pressed_keys = pygame.key.get_pressed()
     tankbody.update(events)
 
     #tankbody.image = pygame.transform.rotate(tankbody.image, 90)
