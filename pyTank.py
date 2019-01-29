@@ -21,35 +21,21 @@ class Tankbody(pygame.sprite.Sprite):
         self.timeRunY = 1
 
 
-    def update(self, events):
+    def update(self, events, dt):
         #这是坦克和鼠标的极坐标差
         tankMousediff = pygame.mouse.get_pos() - pygame.Vector2(self.rect.center)
+        tmDistance, tmTangle = pygame.math.Vector2.as_polar(tankMousediff)
 
         for e in events:
             if e.type == pygame.KEYDOWN:
                 if e.key == pygame.K_SPACE:
                     print("111")#这里打算发射子弹
             if e.type ==  pygame.MOUSEBUTTONDOWN:
-                print("tankMousediff："+str(tankMousediff[0]))
-                print("tankbodyAngle:"+str(self.angle))
+                print("tankMousediffAngel："+str(tmTangle))
+                print("    tankbodyAngl  :"+str(self.angle))
+                self.groups()[0].add(Projectile(self.rect.center, self.direction.normalize()))
 
-
-        pressed = pygame.key.get_pressed()
-        if pressed[pygame.K_a]:
-            self.angle += 3
-            print("tankMousediff："+str(tankMousediff[0]))
-            print("tankbodyAngle:"+str(self.angle))
-        if pressed[pygame.K_d]:
-            self.angle -= 3
-            print("tankMousediff："+str(tankMousediff[0]))
-            print("tankbodyAngle:"+str(self.angle))
-
-        if tankMousediff[0]>self.angle:
-            self.angle += 1
-        elif tankMousediff[0]<self.angle:
-            self.angle -= 1
-
-        self.image = pygame.transform.rotate(self.org_image, self.angle)
+        self.image = pygame.transform.rotate(self.org_image, -tmTangle + 90)
         self.direction = pygame.Vector2(1, 0).rotate(-self.angle)
         self.rect = self.image.get_rect(center=self.rect.center)
 
@@ -63,81 +49,46 @@ class Tankbody(pygame.sprite.Sprite):
         elif self.rect.bottom >= 600:
             self.rect.bottom = 600
 
-        aguAcceleration = 100 #加速度调整参数
-
 
         xDistance = (pygame.mouse.get_pos()[0] - self.rect.x)/10
         yDistance = (pygame.mouse.get_pos()[1] - self.rect.y)/10
-        #print(xDistance)
+
         pygame.time.delay(50)
-        #self.rect.move_ip(xDistance,yDistance)
+        if xDistance > 10 and yDistance > 10:
+            self.rect.move_ip(xDistance,yDistance)
 
 
 
-        # if abs(self.rect.x - pygame.mouse.get_pos()[0]) < 50 and self.timeRunX < 100:
-        #     self.timeRunX += 1
-        #     # print("X_dis:"+ str(abs(self.rect.x - pygame.mouse.get_pos()[0])))
-        #     # print("TimX:" + str(self.timeRunX))
-        # else:
-        #     self.timeRunX = round(abs(self.rect.x - pygame.mouse.get_pos()[0])/aguAcceleration)
-        #
-        #
-        # if self.rect.x + self.rect.width/2 < pygame.mouse.get_pos()[0]:
-        #     pygame.time.delay(self.timeRunX)
-        #     self.rect.x += 1
-        # elif self.rect.x + self.rect.width/2 > pygame.mouse.get_pos()[0]:
-        #     pygame.time.delay(self.timeRunX)
-        #     self.rect.x -= 1
-        #
-        # #纵轴速度调节
-        #
-        # if abs(self.rect.y - pygame.mouse.get_pos()[1]) < 40 and self.timeRunY < 100:
-        #     self.timeRunY += 1
-        # else:
-        #     self.timeRunY = round(abs(self.rect.y - pygame.mouse.get_pos()[1])/aguAcceleration)
-        #
-        #
-        # if self.rect.y + self.rect.height/2 < pygame.mouse.get_pos()[1]:
-        #     pygame.time.delay(self.timeRunY)
-        #     self.rect.y += 1
-        # elif self.rect.y + self.rect.height/2 > pygame.mouse.get_pos()[1]:
-        #     pygame.time.delay(self.timeRunY)
-        #     self.rect.y -= 1
+class Projectile(pygame.sprite.Sprite):
+    def __init__(self, pos, direction):
+        super().__init__()
+        self.image = pygame.Surface((8, 8))
+        self.image.fill((0, 0, 0))
+        self.image.set_colorkey((0, 0, 0))
+        pygame.draw.circle(self.image, pygame.Color('orange'), (4, 4), 4)
+        self.rect = self.image.get_rect(center=pos)
+        self.direction = direction
+        self.pos = pygame.Vector2(self.rect.center)
 
-
-
-
-
-class Tanktower(pygame.sprite.Sprite):
-    def __init__(self):
-        super(Tanktower, self).__init__()
-        self.surf = pygame.Surface((15, 20))
-        self.surf.fill((255, 50, 100))
-        self.rect = self.surf.get_rect()
-        self.draw = pygame.draw.circle(self.surf,(0,20,255),[10,100],3,1)
-
-    def update(self):
-        self.surf = pygame.transform.rotate(self.surf, 32)
-        self.rect = self.get_rect.copy()
-        self.rect.center = self.get_rect.center
+    def update(self, events, dt):
+        self.pos += self.direction * dt
+        self.rect.center = self.pos
+        if not pygame.display.get_surface().get_rect().contains(self.rect):
+            self.kill()
 
 
 pygame.init()
 screen = pygame.display.set_mode((1000, 600))
 
 tankbody = Tankbody()
-tanktower = Tanktower()
 
 background = pygame.Surface(screen.get_size())
 background.fill((0, 0, 20))
 
 all_sprites = pygame.sprite.Group()
 all_sprites.add(tankbody)
-all_sprites.add(tanktower)
-#print(all_sprites)
 
 running = True
-#pygame.mouse.set_visible(True)
 
 while running:
     events = pygame.event.get()
@@ -151,21 +102,6 @@ while running:
     screen.blit(background, (0, 0))
     tankbody.update(events)
 
-    #tankbody.image = pygame.transform.rotate(tankbody.image, 90)
-
-    # for entity in all_sprites:
-    #     #print(entity.rect)
-    #     screen.blit(entity.surf, entity.rect)
-
-
     screen.blit(tankbody.image,tankbody.rect)
-    screen.blit(tanktower.surf,tanktower.rect)
-
-    tanktower.rect.x=tankbody.rect.x+(tankbody.rect.width-tanktower.rect.width)/2
-    tanktower.rect.y=tankbody.rect.y+(tankbody.rect.height-tanktower.rect.height)/2
-
-
-
-    pygame.draw.circle(screen,(0,255,255),[100,100],38,1)
 
     pygame.display.flip()
