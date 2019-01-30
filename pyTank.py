@@ -8,15 +8,12 @@ class Tankbody(pygame.sprite.Sprite):
         self.image = pygame.Surface((26, 38))
         self.image.fill((100, 100, 100))
         self.image.set_colorkey((0, 0, 0))
-        pygame.draw.polygon(self.image, pygame.Color('dodgerblue'), ((0, 8), (26, 8), (13, 38)))
-        #pygame.draw.rect(self.image, (0,255,0), (60,10,50,50))
-
         self.org_image = self.image.copy()
         self.angle = 0
         self.direction = pygame.Vector2(1, 0)
         self.rect = self.image.get_rect(center=(500, 300))
         self.pos = pygame.Vector2(self.rect.center)
-
+        self.groups()[0].add(Tankshell(self.rect.center, self.direction.normalize()))
 
 
     def update(self, events, dt):
@@ -30,6 +27,7 @@ class Tankbody(pygame.sprite.Sprite):
                     print("111")#这里打算发射子弹
             if e.type ==  pygame.MOUSEBUTTONDOWN:
                 self.groups()[0].add(Tankshell(self.rect.center, self.direction.normalize()))
+                #self.groups()[0].add(Tankshell(self.rect.center, self.direction.normalize()-10))
                 print(self.direction.normalize())
 
         self.image = pygame.transform.rotate(self.org_image, -tmTangle + 90)
@@ -50,8 +48,7 @@ class Tankbody(pygame.sprite.Sprite):
         xDistance = (pygame.mouse.get_pos()[0] - self.rect.x)/10
         yDistance = (pygame.mouse.get_pos()[1] - self.rect.y)/10
 
-        pygame.time.delay(50)
-        print(tmDistance)
+        #pygame.time.delay(50)
         if tmDistance > 20:
             self.rect.move_ip(xDistance,yDistance)
 
@@ -73,11 +70,24 @@ class Tankshell(pygame.sprite.Sprite):
         if not pygame.display.get_surface().get_rect().contains(self.rect):
             self.kill()
 
+class Tanktower(pygame.sprite.Sprite):
+    def __init__(self, pos, direction):
+        super().__init__()
+        self.image = pygame.Surface((8, 8))
+        self.image.fill((0, 0, 0))
+        self.image.set_colorkey((0, 0, 0))
+        pygame.draw.circle(self.image, pygame.Color('red'), (8, 8), 8)
+        self.rect = self.image.get_rect(center=pos)
+        self.direction = direction
+        self.pos = pygame.Vector2(self.rect.center)
+
+    def update(self, events, dt):
+        self.rect.center = self.pos
+        print(dt)
+
 
 pygame.init()
 screen = pygame.display.set_mode((1000, 600))
-
-#tankbody = Tankbody()
 
 background = pygame.Surface(screen.get_size())
 background.fill((0, 0, 20))
@@ -98,14 +108,12 @@ while running:
         elif event.type == QUIT:
             running = False
 
-    dt = clock.tick(120)
+    dt = clock.tick(60)
     screen.blit(background, (0, 0))
 
     sprites.update(events, dt)
 
     sprites.draw(screen)
-
-    #screen.blit(tankbody.image,tankbody.rect)
 
     #pygame.display.update()
 
