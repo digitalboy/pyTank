@@ -13,22 +13,26 @@ class Tankbody(pygame.sprite.Sprite):
         self.direction = pygame.Vector2(1, 0)
         self.rect = self.image.get_rect(center=(500, 300))
         self.pos = pygame.Vector2(self.rect.center)
-        self.groups()[0].add(Tankshell(self.rect.center, self.direction.normalize()))
+        print(len(self.groups()))
+        self.booTanktower = True
+        #self.groups()[0].add(Tanktower(self.rect.center, self.direction.normalize()))
 
 
     def update(self, events, dt):
+        #加入炮塔
+        while self.booTanktower:
+            self.groups()[0].add(Tanktower(self.rect.center, self.direction.normalize()))
+            self.booTanktower = False
+
         #这是坦克和鼠标的极坐标差
         tankMousediff = pygame.mouse.get_pos() - pygame.Vector2(self.rect.center)
         tmDistance, tmTangle = pygame.math.Vector2.as_polar(tankMousediff)
 
         for e in events:
-            if e.type == pygame.KEYDOWN:
-                if e.key == pygame.K_SPACE:
-                    print("111")#这里打算发射子弹
+            #print("GGG:"+str(len(self.groups()[0])))
             if e.type ==  pygame.MOUSEBUTTONDOWN:
                 self.groups()[0].add(Tankshell(self.rect.center, self.direction.normalize()))
-                #self.groups()[0].add(Tankshell(self.rect.center, self.direction.normalize()-10))
-                print(self.direction.normalize())
+
 
         self.image = pygame.transform.rotate(self.org_image, -tmTangle + 90)
         self.direction = pygame.Vector2(1, 0).rotate(tmTangle)
@@ -83,7 +87,7 @@ class Tanktower(pygame.sprite.Sprite):
 
     def update(self, events, dt):
         self.rect.center = self.pos
-        print(dt)
+        #print(dt)
 
 
 pygame.init()
@@ -108,7 +112,7 @@ while running:
         elif event.type == QUIT:
             running = False
 
-    dt = clock.tick(60)
+    dt = clock.tick(90)
     screen.blit(background, (0, 0))
 
     sprites.update(events, dt)
