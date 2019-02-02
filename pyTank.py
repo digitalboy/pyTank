@@ -86,23 +86,51 @@ class Tanktower(pygame.sprite.Sprite):
         self.pos = pygame.Vector2(self.rect.center)
 
     def update(self, events, dt):
-        self.pos = sprites.sprites()[0].rect.center
-        #for i in self.groups().sprites:
-        #print(len(sprites.sprites()[0]))
+        self.pos = tankSprites.sprites()[0].rect.center
         self.rect.center = self.pos
 
 class Target(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.Surface((16, 16))
+        self.image = pygame.Surface((20, 20))
         self.image.fill((0, 0, 0))
         self.image.set_colorkey((0, 0, 0))
-        pygame.draw.circle(self.image, pygame.Color('red'), (8, 8), 8)
+        pygame.draw.circle(self.image, pygame.Color('yellow'), (10, 10), 10)
         self.rect = self.image.get_rect(center=(100,100))
         self.pos = pygame.Vector2(self.rect.center)
+        self.t = pygame.sprite.Sprite()
+        self.xMov = 1
+        self.yMov = 1
+        self.life = 100
 
-    def update(self):
+    def update(self, tankGroup):
+        if self.rect.left < 0:
+            self.xMov = 1
+        elif self.rect.right > 1000:
+            self.xMov = -1
+        if self.rect.top <= 0:
+            self.yMov = 1
+        elif self.rect.bottom >= 600:
+            self.yMov = -1
+        self.pos+=(self.xMov,self.yMov)
+        targhit = pygame.sprite.spritecollideany(self,tankGroup)
+        if targhit:
+            print("BBBB")
+            self.life -= 1
         self.rect.center = self.pos
+    def retrnLife(self):
+        i = self.life
+        return(i)
+
+class Score():
+    def __init__(self):
+        super().__init__()
+        self.font = pygame.font.Font(None, 42)
+        self.image = self.font.render("Ready", True, (255, 255, 255))
+        self.rect = self.image.get_rect()
+
+    def update(self, valueDisplay):
+        self.image = self.font.render(str(valueDisplay), True, (255, 255, 255))
 
 pygame.init()
 screen = pygame.display.set_mode((1000, 600))
@@ -110,9 +138,12 @@ screen = pygame.display.set_mode((1000, 600))
 background = pygame.Surface(screen.get_size())
 background.fill((0, 0, 20))
 
-sprites = pygame.sprite.Group(Tankbody())
+tankSprites = pygame.sprite.Group(Tankbody())
 
 targetSpr = pygame.sprite.Group((Target()))
+
+score = Score()
+target = Target()
 
 clock = pygame.time.Clock()
 dt = 0
@@ -131,10 +162,22 @@ while running:
     dt = clock.tick(90)
     screen.blit(background, (0, 0))
 
-    sprites.update(events, dt)
-    sprites.draw(screen)
+    tankSprites.update(events, dt)
+    tankSprites.draw(screen)
 
+    targetSpr.update(tankSprites)
     targetSpr.draw(screen)
+
+    scoreFont = pygame.font.Font(None,40)
+    scoreFontSurf = scoreFont.render("$"+str(targetSpr.sprites()[0].life), True, (255, 255, 255))
+
+    screen.blit(scoreFontSurf, (0, 0))
+
+    i = target.retrnLife()
+    score.update(i)
+    screen.blit(score.image, (200, 0))
+
+
 
     #pygame.display.update()
 
