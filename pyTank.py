@@ -90,8 +90,19 @@ class Tanktower(pygame.sprite.Sprite):
         #for i in self.groups().sprites:
         #print(len(sprites.sprites()[0]))
         self.rect.center = self.pos
-        #print(dt)
 
+class Target(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.Surface((16, 16))
+        self.image.fill((0, 0, 0))
+        self.image.set_colorkey((0, 0, 0))
+        pygame.draw.circle(self.image, pygame.Color('red'), (8, 8), 8)
+        self.rect = self.image.get_rect(center=(100,100))
+        self.pos = pygame.Vector2(self.rect.center)
+
+    def update(self):
+        self.rect.center = self.pos
 
 pygame.init()
 screen = pygame.display.set_mode((1000, 600))
@@ -100,6 +111,8 @@ background = pygame.Surface(screen.get_size())
 background.fill((0, 0, 20))
 
 sprites = pygame.sprite.Group(Tankbody())
+
+targetSpr = pygame.sprite.Group((Target()))
 
 clock = pygame.time.Clock()
 dt = 0
@@ -119,8 +132,9 @@ while running:
     screen.blit(background, (0, 0))
 
     sprites.update(events, dt)
-
     sprites.draw(screen)
+
+    targetSpr.draw(screen)
 
     #pygame.display.update()
 
