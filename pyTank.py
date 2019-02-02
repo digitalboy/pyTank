@@ -49,11 +49,11 @@ class Tankbody(pygame.sprite.Sprite):
             self.rect.bottom = 600
 
 
-        xDistance = (pygame.mouse.get_pos()[0] - self.rect.x)/10
-        yDistance = (pygame.mouse.get_pos()[1] - self.rect.y)/10
+        xDistance = (pygame.mouse.get_pos()[0] - self.rect.x)/20
+        yDistance = (pygame.mouse.get_pos()[1] - self.rect.y)/20
 
-        #pygame.time.delay(50)
-        if tmDistance > 20:
+        pygame.time.Clock().tick(60)
+        if tmDistance > 50:
             self.rect.move_ip(xDistance,yDistance)
 
 
@@ -77,7 +77,7 @@ class Tankshell(pygame.sprite.Sprite):
 class Tanktower(pygame.sprite.Sprite):
     def __init__(self, pos, direction):
         super().__init__()
-        self.image = pygame.Surface((8, 8))
+        self.image = pygame.Surface((16, 16))
         self.image.fill((0, 0, 0))
         self.image.set_colorkey((0, 0, 0))
         pygame.draw.circle(self.image, pygame.Color('red'), (8, 8), 8)
@@ -86,6 +86,9 @@ class Tanktower(pygame.sprite.Sprite):
         self.pos = pygame.Vector2(self.rect.center)
 
     def update(self, events, dt):
+        self.pos = sprites.sprites()[0].rect.center
+        #for i in self.groups().sprites:
+        #print(len(sprites.sprites()[0]))
         self.rect.center = self.pos
         #print(dt)
 
