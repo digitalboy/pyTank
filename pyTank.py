@@ -9,11 +9,9 @@ class Tankbody(pygame.sprite.Sprite):
         self.image.fill((100, 100, 100))
         self.image.set_colorkey((0, 0, 0))
         self.org_image = self.image.copy()
-        self.angle = 0
         self.direction = pygame.Vector2(1, 0)
         self.rect = self.image.get_rect(center=(500, 300))
         self.pos = pygame.Vector2(self.rect.center)
-        print(len(self.groups()))
         self.booTanktower = True
         self.boomSound = pygame.mixer.Sound('cannon.wav')
         self.boomSound.set_volume(0.5)
@@ -124,6 +122,8 @@ class Target(pygame.sprite.Sprite):
             Target.fenshu = self.life
         self.rect.center = self.pos
     def retrnLife(self):
+        if Target.fenshu <= 0:
+            return("WIN!")
         return(str(Target.fenshu))
 
 class Score():
