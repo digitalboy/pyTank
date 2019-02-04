@@ -15,6 +15,7 @@ class Tankbody(pygame.sprite.Sprite):
         self.booTanktower = True
         self.boomSound = pygame.mixer.Sound('cannon.wav')
         self.boomSound.set_volume(0.5)
+        self.shellNum = 100
         #self.groups()[0].add(Tanktower(self.rect.center, self.direction.normalize()))
 
 
@@ -32,7 +33,10 @@ class Tankbody(pygame.sprite.Sprite):
             #print("GGG:"+str(len(self.groups()[0])))
             if e.type ==  pygame.MOUSEBUTTONDOWN:
                 self.groups()[0].add(Tankshell(self.rect.center, self.direction.normalize()))
+                #.add(Tankshell(self.rect.center, self.direction.normalize()))
                 self.boomSound.play()
+                self.shellNum -= 1
+                print(self.shellNum)
 
         self.image = pygame.transform.rotate(self.org_image, -tmTangle + 90)
         self.direction = pygame.Vector2(1, 0).rotate(tmTangle)
@@ -54,6 +58,10 @@ class Tankbody(pygame.sprite.Sprite):
         pygame.time.Clock().tick(60)
         if tmDistance > 50:
             self.rect.move_ip(xDistance,yDistance)
+
+    def returnShellNum(self):
+        #print(self.shellNum)
+        return (str(self.shellNum))
 
 
 class Tankshell(pygame.sprite.Sprite):
@@ -107,11 +115,11 @@ class Target(pygame.sprite.Sprite):
 
     def update(self, tankGroup):
         if self.rect.left < 0:
-            self.xMov = 1
+            self.xMov = 10
         elif self.rect.right > 1000:
             self.xMov = -1
         if self.rect.top <= 0:
-            self.yMov = 1
+            self.yMov = 10
         elif self.rect.bottom >= 600:
             self.yMov = -1
         self.pos+=(self.xMov,self.yMov)
@@ -146,8 +154,12 @@ tankSprites = pygame.sprite.Group(Tankbody())
 
 targetSpr = pygame.sprite.Group((Target()))
 
-score = Score()
+tankshellSprGroup = pygame.sprite.Group(Tankshell((0,0), (pygame.Vector2(1, 0))))
+
+targetLlife = Score()
 target = Target()
+
+tankShellNum = Score()
 
 clock = pygame.time.Clock()
 dt = 0
@@ -169,10 +181,14 @@ while running:
     tankSprites.update(events, dt)
     tankSprites.draw(screen)
 
-    targetSpr.update(tankSprites)
+
+    targetSpr.update(tankshellSprGroup)
     targetSpr.draw(screen)
 
-    score.update(target.retrnLife())
-    screen.blit(score.image, (200, 0))
+    targetLlife.update(target.retrnLife())
+    screen.blit(targetLlife.image, (200, 10))
+
+    tankShellNum.update(tankSprites.sprites()[0].returnShellNum())
+    screen.blit(tankShellNum.image, (400, 10))
 
     pygame.display.flip()
