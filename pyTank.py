@@ -17,21 +17,17 @@ class Tankbody(pygame.sprite.Sprite):
         self.boomSound.set_volume(0.5)
         self.shellNum = 100
         self.anotherGroup = someGroup
-        #self.groups()[0].add(Tanktower(self.rect.center, self.direction.normalize()))
-
 
     def update(self, events, dt):
         #加入炮塔
         while self.booTanktower:
             self.groups()[0].add(Tanktower(self.rect.center, self.direction.normalize()))
             self.booTanktower = False
-
         #这是坦克和鼠标的极坐标差
         tankMousediff = pygame.mouse.get_pos() - pygame.Vector2(self.rect.center)
         tmDistance, tmTangle = pygame.math.Vector2.as_polar(tankMousediff)
 
         for e in events:
-            #print("GGG:"+str(len(self.groups()[0])))
             if e.type ==  pygame.MOUSEBUTTONDOWN:
                 print(self.shellNum)
                 self.boomSound.play()
@@ -41,9 +37,7 @@ class Tankbody(pygame.sprite.Sprite):
                     self.anotherGroup.add(Tankshell(self.rect.center, self.direction.normalize()))
                     self.shellNum -= 1
 
-        #tankshellSprGroup.update(self.rect.center, self.direction.normalize())
         self.anotherGroup.update(self.rect.center, self.direction.normalize())
-
         self.image = pygame.transform.rotate(self.org_image, -tmTangle + 90)
         self.direction = pygame.Vector2(1, 0).rotate(tmTangle)
         self.rect = self.image.get_rect(center=self.rect.center)
@@ -57,7 +51,6 @@ class Tankbody(pygame.sprite.Sprite):
         elif self.rect.bottom >= 600:
             self.rect.bottom = 600
 
-
         xDistance = (pygame.mouse.get_pos()[0] - self.rect.x)/20
         yDistance = (pygame.mouse.get_pos()[1] - self.rect.y)/20
 
@@ -68,10 +61,6 @@ class Tankbody(pygame.sprite.Sprite):
     def returnShellNum(self):
         #print(self.shellNum)
         return (str(self.shellNum))
-
-# class Shotshell(pygame.sprite.Sprite):
-#     def __init__(self):
-
 
 class Tankshell(pygame.sprite.Sprite):
     def __init__(self, pos, direction):
