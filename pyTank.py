@@ -3,7 +3,7 @@ import pygame
 from pygame.locals import *
 
 class Tankbody(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, someGroup):
         super().__init__()
         self.image = pygame.Surface((26, 38))
         self.image.fill((100, 100, 100))
@@ -16,6 +16,7 @@ class Tankbody(pygame.sprite.Sprite):
         self.boomSound = pygame.mixer.Sound('cannon.wav')
         self.boomSound.set_volume(0.5)
         self.shellNum = 100
+        self.anotherGroup = someGroup
         #self.groups()[0].add(Tanktower(self.rect.center, self.direction.normalize()))
 
 
@@ -33,14 +34,15 @@ class Tankbody(pygame.sprite.Sprite):
             #print("GGG:"+str(len(self.groups()[0])))
             if e.type ==  pygame.MOUSEBUTTONDOWN:
                 print(self.shellNum)
+                self.boomSound.play()
                 if self.shellNum < 0:
                     self.shellNum = 0
                 else:
-                    tankshellSprGroup.add(Tankshell(self.rect.center, self.direction.normalize()))
+                    self.anotherGroup.add(Tankshell(self.rect.center, self.direction.normalize()))
                     self.shellNum -= 1
 
         #tankshellSprGroup.update(self.rect.center, self.direction.normalize())
-        tankshellSprGroup.update(self.rect.center, self.direction.normalize())
+        self.anotherGroup.update(self.rect.center, self.direction.normalize())
 
         self.image = pygame.transform.rotate(self.org_image, -tmTangle + 90)
         self.direction = pygame.Vector2(1, 0).rotate(tmTangle)
@@ -160,11 +162,11 @@ screen = pygame.display.set_mode((1000, 600))
 background = pygame.Surface(screen.get_size())
 background.fill((0, 0, 20))
 
-tankSprites = pygame.sprite.Group(Tankbody())
+tankshellSprGroup = pygame.sprite.Group(Tankshell((0,0), (pygame.Vector2(1, 0))))
+
+tankSprites = pygame.sprite.Group(Tankbody(tankshellSprGroup))
 
 targetSpr = pygame.sprite.Group((Target()))
-
-tankshellSprGroup = pygame.sprite.Group(Tankshell((0,0), (pygame.Vector2(1, 0))))
 
 targetLlife = Score()
 target = Target()
