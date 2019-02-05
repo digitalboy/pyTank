@@ -32,11 +32,15 @@ class Tankbody(pygame.sprite.Sprite):
         for e in events:
             #print("GGG:"+str(len(self.groups()[0])))
             if e.type ==  pygame.MOUSEBUTTONDOWN:
-                self.groups()[0].add(Tankshell(self.rect.center, self.direction.normalize()))
-                #.add(Tankshell(self.rect.center, self.direction.normalize()))
-                self.boomSound.play()
-                self.shellNum -= 1
                 print(self.shellNum)
+                if self.shellNum < 0:
+                    self.shellNum = 0
+                else:
+                    tankshellSprGroup.add(Tankshell(self.rect.center, self.direction.normalize()))
+                    self.shellNum -= 1
+
+        #tankshellSprGroup.update(self.rect.center, self.direction.normalize())
+        tankshellSprGroup.update(self.rect.center, self.direction.normalize())
 
         self.image = pygame.transform.rotate(self.org_image, -tmTangle + 90)
         self.direction = pygame.Vector2(1, 0).rotate(tmTangle)
@@ -63,6 +67,9 @@ class Tankbody(pygame.sprite.Sprite):
         #print(self.shellNum)
         return (str(self.shellNum))
 
+# class Shotshell(pygame.sprite.Sprite):
+#     def __init__(self):
+
 
 class Tankshell(pygame.sprite.Sprite):
     def __init__(self, pos, direction):
@@ -76,7 +83,7 @@ class Tankshell(pygame.sprite.Sprite):
         self.pos = pygame.Vector2(self.rect.center)
 
     def update(self, events, dt):
-        self.pos += self.direction * dt
+        self.pos += self.direction * 5
         self.rect.center = self.pos
         if not pygame.display.get_surface().get_rect().contains(self.rect):
             self.kill()
@@ -125,9 +132,12 @@ class Target(pygame.sprite.Sprite):
         self.pos+=(self.xMov,self.yMov)
         targhit = pygame.sprite.spritecollideany(self,tankGroup)
         if targhit:
+            #pygame.time.wait(200)
             self.painSound.play()
             self.life -= 1
             Target.fenshu = self.life
+            targhit.kill()
+
         self.rect.center = self.pos
     def retrnLife(self):
         if Target.fenshu <= 0:
@@ -181,14 +191,20 @@ while running:
     tankSprites.update(events, dt)
     tankSprites.draw(screen)
 
+    #tankshellSprGroup.update()
+    tankshellSprGroup.draw(screen)
 
     targetSpr.update(tankshellSprGroup)
     targetSpr.draw(screen)
 
-    targetLlife.update(target.retrnLife())
-    screen.blit(targetLlife.image, (200, 10))
+    #显示怪兽生命值
+    str_targetLlife = "Monster Life:" + target.retrnLife()
+    targetLlife.update(str_targetLlife)
+    screen.blit(targetLlife.image, (10, 10))
 
-    tankShellNum.update(tankSprites.sprites()[0].returnShellNum())
+    #显示打出了多少炮弹
+    str_shellRemained = "Your Shells:" + tankSprites.sprites()[0].returnShellNum()
+    tankShellNum.update(str_shellRemained)
     screen.blit(tankShellNum.image, (400, 10))
 
     pygame.display.flip()
